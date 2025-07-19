@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CipherQuest</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>CipherQuest</span>
+            </div>
+            <button type="button" class="sidebar-toggle" aria-label="Toggle navigation menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="#dashboard" class="sidebar-link active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="modules.html" class="sidebar-link">
+                <i class="fas fa-book"></i>
+                <span>Modules</span>
+            </a>
+            <a href="ctf-labs.html" class="sidebar-link">
+                <i class="fas fa-flag"></i>
+                <span>CTF Labs</span>
+            </a>
+            <a href="ai-tutor.html" class="sidebar-link">
+                <i class="fas fa-robot"></i>
+                <span>AI Tutor</span>
+            </a>
+            <a href="profile.html" class="sidebar-link">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-footer">
+            <a href="login.html" class="sidebar-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <h1>Dashboard</h1>
+                <p>Welcome back, <span class="username">CyberHacker</span>!</p>
+            </div>
+            <div class="top-bar-right">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-menu">
+                    <img src="https://via.placeholder.com/40x40/00ff88/000000?text=CH" alt="User Avatar" class="user-avatar">
+                    <span class="user-name">CyberHacker</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- User Profile Card -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <img src="https://via.placeholder.com/80x80/00ff88/000000?text=CH" alt="Profile Avatar">
+                        <div class="level-badge">Level 15</div>
+                    </div>
+                    <div class="profile-info">
+                        <h2>CyberHacker</h2>
+                        <p class="user-title">Elite Hacker</p>
+                        <div class="user-stats">
+                            <div class="stat">
+                                <span class="stat-value">2,450</span>
+                                <span class="stat-label">XP</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">47</span>
+                                <span class="stat-label">Challenges</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">12</span>
+                                <span class="stat-label">Badges</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-progress">
+                    <div class="progress-info">
+                        <span>Progress to Level 16</span>
+                        <span>2,450 / 3,000 XP</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-fill-82"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Current Rank</h3>
+                        <p class="stat-number">#127</p>
+                        <span class="stat-change positive">+5 this week</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Streak</h3>
+                        <p class="stat-number">7 days</p>
+                        <span class="stat-change">Keep it up!</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Time Spent</h3>
+                        <p class="stat-number">24h 32m</p>
+                        <span class="stat-change">This week</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Accuracy</h3>
+                        <p class="stat-number">94.2%</p>
+                        <span class="stat-change positive">+2.1%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity & Leaderboard -->
+            <div class="dashboard-grid">
+                <!-- Recent Activity -->
+                <div class="activity-card">
+                    <div class="card-header">
+                        <h3>Recent Activity</h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon success">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Completed Web Hacking Module</h4>
+                                <p>Earned 150 XP and unlocked "Web Warrior" badge</p>
+                                <span class="activity-time">2 hours ago</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon challenge">
+                                <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Started CTF Challenge: "CryptoVault"</h4>
+                                <p>Advanced cryptography challenge</p>
+                                <span class="activity-time">5 hours ago</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon ai">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>AI Tutor Session</h4>
+                                <p>Learned about SQL injection techniques</p>
+                                <span class="activity-time">1 day ago</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon badge">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>Unlocked "Forensics Master" Badge</h4>
+                                <p>Completed 10 forensics challenges</p>
+                                <span class="activity-time">2 days ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard -->
+                <div class="leaderboard-card">
+                    <div class="card-header">
+                        <h3>Top Hackers</h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    <div class="leaderboard-list">
+                        <div class="leaderboard-item top">
+                            <div class="rank">1</div>
+                            <div class="player-info">
+                                <img src="https://via.placeholder.com/32x32/ffd700/000000?text=1" alt="Player 1">
+                                <div>
+                                    <h4>NeoMatrix</h4>
+                                    <span>Level 42</span>
+                                </div>
+                            </div>
+                            <div class="player-score">15,420 XP</div>
+                        </div>
+                        
+                        <div class="leaderboard-item top">
+                            <div class="rank">2</div>
+                            <div class="player-info">
+                                <img src="https://via.placeholder.com/32x32/c0c0c0/000000?text=2" alt="Player 2">
+                                <div>
+                                    <h4>ByteMaster</h4>
+                                    <span>Level 38</span>
+                                </div>
+                            </div>
+                            <div class="player-score">13,890 XP</div>
+                        </div>
+                        
+                        <div class="leaderboard-item top">
+                            <div class="rank">3</div>
+                            <div class="player-info">
+                                <img src="https://via.placeholder.com/32x32/cd7f32/000000?text=3" alt="Player 3">
+                                <div>
+                                    <h4>CodeNinja</h4>
+                                    <span>Level 35</span>
+                                </div>
+                            </div>
+                            <div class="player-score">12,340 XP</div>
+                        </div>
+                        
+                        <div class="leaderboard-item current">
+                            <div class="rank">127</div>
+                            <div class="player-info">
+                                <img src="https://via.placeholder.com/32x32/00ff88/000000?text=CH" alt="You">
+                                <div>
+                                    <h4>CyberHacker</h4>
+                                    <span>Level 15</span>
+                                </div>
+                            </div>
+                            <div class="player-score">2,450 XP</div>
+                        </div>
+                        
+                        <div class="leaderboard-item">
+                            <div class="rank">128</div>
+                            <div class="player-info">
+                                <img src="https://via.placeholder.com/32x32/666666/ffffff?text=128" alt="Player 128">
+                                <div>
+                                    <h4>ScriptKiddie</h4>
+                                    <span>Level 14</span>
+                                </div>
+                            </div>
+                            <div class="player-score">2,380 XP</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommended Challenges -->
+            <div class="challenges-section">
+                <div class="section-header">
+                    <h2>Recommended for You</h2>
+                    <p>Based on your current level and interests</p>
+                </div>
+                
+                <div class="challenges-grid">
+                    <div class="challenge-card">
+                        <div class="challenge-header">
+                            <div class="challenge-difficulty easy">Easy</div>
+                            <div class="challenge-type">
+                                <i class="fas fa-globe"></i>
+                                Web Hacking
+                            </div>
+                        </div>
+                        <h3>SQL Injection Basics</h3>
+                        <p>Learn the fundamentals of SQL injection attacks and defenses.</p>
+                        <div class="challenge-meta">
+                            <span><i class="fas fa-clock"></i> 30 min</span>
+                            <span><i class="fas fa-star"></i> 100 XP</span>
+                        </div>
+                        <button class="btn btn-primary">Start Challenge</button>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <div class="challenge-header">
+                            <div class="challenge-difficulty medium">Medium</div>
+                            <div class="challenge-type">
+                                <i class="fas fa-shield-alt"></i>
+                                Forensics
+                            </div>
+                        </div>
+                        <h3>Memory Forensics</h3>
+                        <p>Analyze memory dumps to uncover hidden processes and malware.</p>
+                        <div class="challenge-meta">
+                            <span><i class="fas fa-clock"></i> 45 min</span>
+                            <span><i class="fas fa-star"></i> 200 XP</span>
+                        </div>
+                        <button class="btn btn-secondary">Start Challenge</button>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <div class="challenge-header">
+                            <div class="challenge-difficulty hard">Hard</div>
+                            <div class="challenge-type">
+                                <i class="fas fa-key"></i>
+                                Cryptography
+                            </div>
+                        </div>
+                        <h3>RSA Implementation</h3>
+                        <p>Implement and break RSA encryption algorithms.</p>
+                        <div class="challenge-meta">
+                            <span><i class="fas fa-clock"></i> 60 min</span>
+                            <span><i class="fas fa-star"></i> 300 XP</span>
+                        </div>
+                        <button class="btn btn-secondary">Start Challenge</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html> 
