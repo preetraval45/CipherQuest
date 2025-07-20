@@ -1,0 +1,1180 @@
+openapi: 3.0.3
+info:
+  title: CipherQuest API
+  description: |
+    A comprehensive cybersecurity learning platform API that provides authentication, 
+    module management, CTF challenges, leaderboards, and user progress tracking.
+    
+    ## Features
+    - JWT-based authentication with OAuth support (Google, GitHub)
+    - Learning modules with progress tracking
+    - CTF challenges with flag submission
+    - Real-time leaderboards
+    - User profile and progress management
+    - Admin dashboard and content management
+    
+    ## Authentication
+    Most endpoints require JWT authentication. Include the access token in the Authorization header:
+    ```
+    Authorization: Bearer <your_access_token>
+    ```
+    
+    ## Rate Limiting
+    - Auth endpoints: 5-10 requests per minute
+    - Challenge submission: 20 requests per minute
+    - Other endpoints: 30-60 requests per minute
+  version: 1.0.0
+  contact:
+    name: CipherQuest Support
+    email: support@cipherquest.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.cipherquest.com
+    description: Production server
+  - url: https://cipherquest-api.herokuapp.com
+    description: Heroku deployment
+  - url: http://localhost:5000
+    description: Local development server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 30
+                  pattern: '^[a-zA-Z0-9_]+$'
+                  example: "hacker123"
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  minLength: 8
+                  example: "securePassword123"
+                first_name:
+                  type: string
+                  maxLength: 50
+                  example: "John"
+                last_name:
+                  type: string
+                  maxLength: 50
+                  example: "Doe"
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User registered successfully"
+                  user:
+                    $ref: '#/components/schemas/User'
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  refresh_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Username or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: Authenticate user with username/email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - password
+              properties:
+                username:
+                  type: string
+                  example: "hacker123"
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "securePassword123"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login successful"
+                  user:
+                    $ref: '#/components/schemas/User'
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  refresh_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Get a new access token using refresh token
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+        '401':
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: Logout current user (token invalidation)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logout successful"
+
+  /api/auth/google:
+    post:
+      tags:
+        - Authentication
+      summary: Google OAuth login
+      description: Authenticate user with Google OAuth token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - access_token
+              properties:
+                access_token:
+                  type: string
+                  description: Google OAuth access token
+                  example: "ya29.a0AfH6SMC..."
+      responses:
+        '200':
+          description: OAuth login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "OAuth login successful"
+                  user:
+                    $ref: '#/components/schemas/User'
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  refresh_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+
+  /api/auth/github:
+    post:
+      tags:
+        - Authentication
+      summary: GitHub OAuth login
+      description: Authenticate user with GitHub OAuth token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - access_token
+              properties:
+                access_token:
+                  type: string
+                  description: GitHub OAuth access token
+                  example: "gho_..."
+      responses:
+        '200':
+          description: OAuth login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "OAuth login successful"
+                  user:
+                    $ref: '#/components/schemas/User'
+                  access_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  refresh_token:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+
+  /api/auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      description: Get current authenticated user's profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/modules:
+    get:
+      tags:
+        - Modules
+      summary: Get all modules
+      description: Retrieve all learning modules with optional filtering
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          description: Filter by module category
+          schema:
+            type: string
+            example: "web-security"
+        - name: difficulty
+          in: query
+          description: Filter by difficulty level
+          schema:
+            type: string
+            enum: [beginner, intermediate, advanced]
+            example: "beginner"
+        - name: limit
+          in: query
+          description: Number of modules to return
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+            example: 20
+        - name: offset
+          in: query
+          description: Number of modules to skip
+          schema:
+            type: integer
+            default: 0
+            example: 0
+      responses:
+        '200':
+          description: List of modules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  modules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Module'
+                  total:
+                    type: integer
+                    example: 25
+                  limit:
+                    type: integer
+                    example: 20
+                  offset:
+                    type: integer
+                    example: 0
+
+  /api/modules/{module_id}:
+    get:
+      tags:
+        - Modules
+      summary: Get module details
+      description: Retrieve detailed information about a specific module
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: module_id
+          in: path
+          required: true
+          description: Module ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Module details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  module:
+                    $ref: '#/components/schemas/ModuleDetail'
+        '404':
+          description: Module not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/modules/{module_id}/complete:
+    post:
+      tags:
+        - Modules
+      summary: Complete module
+      description: Mark a module as completed and award points
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: module_id
+          in: path
+          required: true
+          description: Module ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Module completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Module completed successfully"
+                  progress:
+                    $ref: '#/components/schemas/UserProgress'
+                  experience_gained:
+                    type: integer
+                    example: 100
+        '404':
+          description: Module not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/challenges:
+    get:
+      tags:
+        - Challenges
+      summary: Get all challenges
+      description: Retrieve all CTF challenges with optional filtering
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          description: Filter by challenge category
+          schema:
+            type: string
+            example: "web"
+        - name: difficulty
+          in: query
+          description: Filter by difficulty level
+          schema:
+            type: string
+            enum: [easy, medium, hard]
+            example: "easy"
+        - name: module_id
+          in: query
+          description: Filter by associated module
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          description: Number of challenges to return
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+            example: 20
+        - name: offset
+          in: query
+          description: Number of challenges to skip
+          schema:
+            type: integer
+            default: 0
+            example: 0
+      responses:
+        '200':
+          description: List of challenges
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challenges:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Challenge'
+                  total:
+                    type: integer
+                    example: 50
+                  limit:
+                    type: integer
+                    example: 20
+                  offset:
+                    type: integer
+                    example: 0
+
+  /api/challenges/{challenge_id}:
+    get:
+      tags:
+        - Challenges
+      summary: Get challenge details
+      description: Retrieve detailed information about a specific challenge
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          description: Challenge ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Challenge details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challenge:
+                    $ref: '#/components/schemas/Challenge'
+        '404':
+          description: Challenge not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/challenges/{challenge_id}/submit:
+    post:
+      tags:
+        - Challenges
+      summary: Submit flag
+      description: Submit a flag for a challenge
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          description: Challenge ID
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - flag
+              properties:
+                flag:
+                  type: string
+                  description: The flag to submit
+                  example: "flag{this_is_a_test_flag}"
+      responses:
+        '200':
+          description: Flag submission result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Flag is correct!"
+                  points_earned:
+                    type: integer
+                    example: 50
+                  progress:
+                    $ref: '#/components/schemas/UserProgress'
+                  attempts:
+                    type: integer
+                    example: 3
+        '400':
+          description: Invalid flag format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Challenge not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/challenges/{challenge_id}/hint:
+    get:
+      tags:
+        - Challenges
+      summary: Get challenge hint
+      description: Retrieve a hint for a challenge
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          description: Challenge ID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Challenge hint
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hint:
+                    type: string
+                    example: "Check the source code of the page"
+                  hint_cost:
+                    type: integer
+                    example: 10
+        '404':
+          description: Challenge not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/leaderboard:
+    get:
+      tags:
+        - Leaderboard
+      summary: Get leaderboard
+      description: Retrieve the global leaderboard rankings
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Number of entries to return
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+            example: 20
+        - name: offset
+          in: query
+          description: Number of entries to skip
+          schema:
+            type: integer
+            default: 0
+            example: 0
+      responses:
+        '200':
+          description: Leaderboard rankings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  leaderboard:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LeaderboardEntry'
+                  total:
+                    type: integer
+                    example: 1000
+                  limit:
+                    type: integer
+                    example: 20
+                  offset:
+                    type: integer
+                    example: 0
+
+  /api/leaderboard/top:
+    get:
+      tags:
+        - Leaderboard
+      summary: Get top players
+      description: Retrieve the top 10 players
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Top players
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  top_players:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LeaderboardEntry'
+
+  /api/leaderboard/my-rank:
+    get:
+      tags:
+        - Leaderboard
+      summary: Get user's rank
+      description: Get current user's position in the leaderboard
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User's rank
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rank:
+                    type: integer
+                    example: 42
+                  total_players:
+                    type: integer
+                    example: 1000
+                  score:
+                    type: integer
+                    example: 1250
+
+  /api/user/profile:
+    get:
+      tags:
+        - User
+      summary: Get user profile
+      description: Retrieve current user's profile information
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /api/user/profile:
+    put:
+      tags:
+        - User
+      summary: Update user profile
+      description: Update current user's profile information
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  maxLength: 50
+                  example: "John"
+                last_name:
+                  type: string
+                  maxLength: 50
+                  example: "Doe"
+                bio:
+                  type: string
+                  maxLength: 500
+                  example: "Cybersecurity enthusiast"
+                avatar_url:
+                  type: string
+                  format: uri
+                  example: "https://example.com/avatar.jpg"
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Profile updated successfully"
+                  user:
+                    $ref: '#/components/schemas/User'
+
+  /api/user/progress:
+    get:
+      tags:
+        - User
+      summary: Get user progress
+      description: Retrieve current user's learning progress
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User progress
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_modules:
+                    type: integer
+                    example: 25
+                  completed_modules:
+                    type: integer
+                    example: 12
+                  total_challenges:
+                    type: integer
+                    example: 100
+                  completed_challenges:
+                    type: integer
+                    example: 45
+                  total_experience:
+                    type: integer
+                    example: 2500
+                  current_level:
+                    type: integer
+                    example: 5
+                  progress_percentage:
+                    type: number
+                    format: float
+                    example: 48.0
+
+  /api/admin/dashboard:
+    get:
+      tags:
+        - Admin
+      summary: Admin dashboard
+      description: Retrieve admin dashboard statistics
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Admin dashboard data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_users:
+                    type: integer
+                    example: 1250
+                  active_users:
+                    type: integer
+                    example: 890
+                  total_modules:
+                    type: integer
+                    example: 25
+                  total_challenges:
+                    type: integer
+                    example: 100
+                  recent_registrations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  system_stats:
+                    type: object
+                    properties:
+                      uptime:
+                        type: string
+                        example: "5 days, 12 hours"
+                      memory_usage:
+                        type: number
+                        format: float
+                        example: 75.5
+                      cpu_usage:
+                        type: number
+                        format: float
+                        example: 45.2
+        '403':
+          description: Access denied - admin privileges required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/admin/users:
+    get:
+      tags:
+        - Admin
+      summary: List all users
+      description: Retrieve all users (admin only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Number of users to return
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+            example: 20
+        - name: offset
+          in: query
+          description: Number of users to skip
+          schema:
+            type: integer
+            default: 0
+            example: 0
+        - name: search
+          in: query
+          description: Search users by username or email
+          schema:
+            type: string
+            example: "john"
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  total:
+                    type: integer
+                    example: 1250
+                  limit:
+                    type: integer
+                    example: 20
+                  offset:
+                    type: integer
+                    example: 0
+        '403':
+          description: Access denied - admin privileges required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: "hacker123"
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://example.com/avatar.jpg"
+        experience:
+          type: integer
+          example: 2500
+        level:
+          type: integer
+          example: 5
+        rank:
+          type: string
+          example: "Elite Hacker"
+        is_active:
+          type: boolean
+          example: true
+        email_verified:
+          type: boolean
+          example: true
+        oauth_provider:
+          type: string
+          nullable: true
+          example: "google"
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2024-01-20T14:45:00Z"
+
+    Module:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Web Security Fundamentals"
+        description:
+          type: string
+          example: "Learn the basics of web security"
+        category:
+          type: string
+          example: "web-security"
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          example: "beginner"
+        points:
+          type: integer
+          example: 100
+        order:
+          type: integer
+          example: 1
+        is_active:
+          type: boolean
+          example: true
+        user_progress:
+          $ref: '#/components/schemas/UserProgress'
+          nullable: true
+
+    ModuleDetail:
+      allOf:
+        - $ref: '#/components/schemas/Module'
+        - type: object
+          properties:
+            content:
+              type: string
+              example: "# Web Security Fundamentals\n\nThis module covers..."
+            prerequisites:
+              type: array
+              items:
+                type: integer
+              example: [1, 2]
+            challenges:
+              type: array
+              items:
+                $ref: '#/components/schemas/Challenge'
+
+    Challenge:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "SQL Injection Basics"
+        description:
+          type: string
+          example: "Learn about SQL injection vulnerabilities"
+        category:
+          type: string
+          example: "web"
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+          example: "easy"
+        points:
+          type: integer
+          example: 50
+        module_id:
+          type: integer
+          example: 1
+        is_active:
+          type: boolean
+          example: true
+        user_progress:
+          $ref: '#/components/schemas/UserProgress'
+          nullable: true
+
+    UserProgress:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_id:
+          type: integer
+          example: 1
+        module_id:
+          type: integer
+          nullable: true
+          example: 1
+        challenge_id:
+          type: integer
+          nullable: true
+          example: 1
+        completed:
+          type: boolean
+          example: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2024-01-20T15:30:00Z"
+        attempts:
+          type: integer
+          example: 3
+        time_spent:
+          type: integer
+          description: Time spent in seconds
+          example: 1800
+        score:
+          type: integer
+          example: 100
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user:
+          $ref: '#/components/schemas/User'
+        rank:
+          type: integer
+          example: 1
+        score:
+          type: integer
+          example: 2500
+        completed_modules:
+          type: integer
+          example: 12
+        completed_challenges:
+          type: integer
+          example: 45
+        last_activity:
+          type: string
+          format: date-time
+          example: "2024-01-20T16:00:00Z"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid credentials"
+        message:
+          type: string
+          example: "The provided credentials are incorrect"
+        code:
+          type: string
+          example: "AUTH_001"
+        details:
+          type: object
+          additionalProperties: true
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization endpoints
+  - name: Modules
+    description: Learning module management
+  - name: Challenges
+    description: CTF challenge management
+  - name: Leaderboard
+    description: User rankings and leaderboard
+  - name: User
+    description: User profile and progress management
+  - name: Admin
+    description: Administrative functions (admin only) 

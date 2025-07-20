@@ -6,7 +6,8 @@ from flask_limiter.util import get_remote_address
 from models.challenge import Challenge, Flag, db
 from models.progress import UserProgress
 from models.user import User
-from utils.validators import validate_flag_format
+from utils.validators import validate_flag_format, sanitize_user_input, validate_json_data, ValidationError
+from utils.rate_limiting import sensitive_rate_limit, api_rate_limit
 
 challenges_bp = Blueprint('challenges', __name__)
 limiter = Limiter(key_func=get_remote_address)
@@ -95,20 +96,29 @@ def get_challenge(challenge_id):
 
 @challenges_bp.route('/<int:challenge_id>/submit', methods=['POST'])
 @jwt_required()
-@limiter.limit("20 per minute")
+@sensitive_rate_limit
 def submit_flag(challenge_id):
     """Submit flag for a challenge"""
     try:
         current_user_id = get_jwt_identity()
         data = request.get_json()
         
-        if not data or 'flag' not in data:
-            return jsonify({'error': 'Flag is required'}), 400
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
         
-        submitted_flag = data['flag'].strip()
+        # Validate and sanitize input data
+        try:
+            validated_data = validate_json_data(
+                data,
+                required_fields=['flag']
+            )
+        except ValidationError as e:
+            return jsonify({'error': str(e)}), 400
         
-        # Validate flag format
-        if not validate_flag_format(submitted_flag):
+        # Sanitize and validate flag
+        submitted_flag = sanitize_user_input(validated_data['flag'], 'flag')
+        
+        if not submitted_flag:
             return jsonify({'error': 'Invalid flag format'}), 400
         
         # Check if challenge exists

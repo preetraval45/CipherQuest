@@ -8,7 +8,11 @@ import requests
 from datetime import datetime
 
 from models.user import User, db
-from utils.validators import validate_email, validate_password, validate_username
+from utils.validators import (
+    validate_email, validate_password, validate_username, 
+    sanitize_user_input, validate_json_data, ValidationError
+)
+from utils.rate_limiting import auth_rate_limit, sensitive_rate_limit
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -16,7 +20,7 @@ auth_bp = Blueprint('auth', __name__)
 limiter = Limiter(key_func=get_remote_address)
 
 @auth_bp.route('/register', methods=['POST'])
-@limiter.limit("5 per minute")
+@auth_rate_limit
 def register():
     """User registration endpoint"""
     try:
@@ -25,25 +29,35 @@ def register():
         if not data:
             return jsonify({'error': 'No data provided'}), 400
         
-        # Validate required fields
-        required_fields = ['username', 'email', 'password']
-        for field in required_fields:
-            if field not in data or not data[field]:
-                return jsonify({'error': f'{field} is required'}), 400
+        # Validate and sanitize input data
+        try:
+            validated_data = validate_json_data(
+                data,
+                required_fields=['username', 'email', 'password'],
+                optional_fields={
+                    'first_name': str,
+                    'last_name': str
+                }
+            )
+        except ValidationError as e:
+            return jsonify({'error': str(e)}), 400
         
-        username = data['username'].strip()
-        email = data['email'].strip().lower()
-        password = data['password']
+        # Sanitize and validate individual fields
+        username = sanitize_user_input(validated_data['username'], 'username')
+        email = sanitize_user_input(validated_data['email'], 'email')
+        password = validated_data['password']  # Don't sanitize password
+        first_name = sanitize_user_input(validated_data.get('first_name', ''), 'text')
+        last_name = sanitize_user_input(validated_data.get('last_name', ''), 'text')
         
-        # Validate input
-        if not validate_username(username):
+        # Validate sanitized input
+        if not username:
             return jsonify({'error': 'Invalid username format'}), 400
         
-        if not validate_email(email):
+        if not email:
             return jsonify({'error': 'Invalid email format'}), 400
         
         if not validate_password(password):
-            return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+            return jsonify({'error': 'Password must be at least 8 characters long with uppercase, lowercase, digit, and special character'}), 400
         
         # Check if user already exists
         if User.query.filter_by(username=username).first():
@@ -57,8 +71,8 @@ def register():
             username=username,
             email=email,
             password=password,
-            first_name=data.get('first_name', ''),
-            last_name=data.get('last_name', '')
+            first_name=first_name,
+            last_name=last_name
         )
         
         db.session.add(user)
@@ -80,7 +94,7 @@ def register():
         return jsonify({'error': 'Registration failed'}), 500
 
 @auth_bp.route('/login', methods=['POST'])
-@limiter.limit("10 per minute")
+@auth_rate_limit
 def login():
     """User login endpoint"""
     try:
@@ -89,12 +103,28 @@ def login():
         if not data:
             return jsonify({'error': 'No data provided'}), 400
         
+        # Validate and sanitize input data
+        try:
+            validated_data = validate_json_data(
+                data,
+                required_fields=['password'],
+                optional_fields={
+                    'username': str,
+                    'email': str
+                }
+            )
+        except ValidationError as e:
+            return jsonify({'error': str(e)}), 400
+        
         # Check if login with username or email
-        identifier = data.get('username') or data.get('email')
-        password = data.get('password')
+        identifier = validated_data.get('username') or validated_data.get('email')
+        password = validated_data['password']
         
         if not identifier or not password:
             return jsonify({'error': 'Username/email and password are required'}), 400
+        
+        # Sanitize identifier
+        identifier = sanitize_user_input(identifier, 'text')
         
         # Find user
         if '@' in identifier:
@@ -127,6 +157,7 @@ def login():
 
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
+@sensitive_rate_limit
 def logout():
     """User logout endpoint"""
     try:
@@ -138,6 +169,7 @@ def logout():
 
 @auth_bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
+@sensitive_rate_limit
 def refresh():
     """Refresh access token endpoint"""
     try:
