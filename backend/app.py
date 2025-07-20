@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
@@ -41,21 +41,60 @@ def create_app(config_name='default'):
     db.init_app(app)
     
     # Use the same db instance across all models
-    user_db.init_app(app)
-    module_db.init_app(app)
-    challenge_db.init_app(app)
-    progress_db.init_app(app)
-    leaderboard_db.init_app(app)
+    # user_db.init_app(app)
+    # module_db.init_app(app)
+    # challenge_db.init_app(app)
+    # progress_db.init_app(app)
+    # leaderboard_db.init_app(app)
     
     migrate = Migrate(app, db)
     jwt = JWTManager(app)
-    CORS(app)
+    
+    # Configure CORS with security settings
+    CORS(app, 
+         origins=app.config.get('CORS_ORIGINS', ['http://localhost:3000']),
+         methods=app.config.get('CORS_METHODS', ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']),
+         allow_headers=app.config.get('CORS_ALLOW_HEADERS', ['Content-Type', 'Authorization', 'X-Requested-With']),
+         supports_credentials=True)
+    
     limiter = Limiter(
         app=app,
         key_func=get_remote_address,
         default_limits=["200 per day", "50 per hour"]
     )
     bcrypt.init_app(app)
+    
+    # Security headers middleware
+    @app.after_request
+    def add_security_headers(response):
+        """Add security headers to all responses."""
+        # Content Security Policy
+        response.headers['Content-Security-Policy'] = app.config.get('CONTENT_SECURITY_POLICY', 
+            "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';")
+        
+        # Strict Transport Security
+        response.headers['Strict-Transport-Security'] = app.config.get('STRICT_TRANSPORT_SECURITY', 
+            'max-age=31536000; includeSubDomains')
+        
+        # X-Frame-Options
+        response.headers['X-Frame-Options'] = 'DENY'
+        
+        # X-Content-Type-Options
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        
+        # X-XSS-Protection
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        
+        # Referrer Policy
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        
+        # Permissions Policy
+        response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+        
+        # Remove server information
+        response.headers['Server'] = 'CipherQuest'
+        
+        return response
     
     # Configure logging
     if not app.debug and not app.testing:
@@ -82,7 +121,6 @@ def create_app(config_name='default'):
     app.register_blueprint(docs_bp, url_prefix='/api')
     
     # Error handlers
-    from flask import jsonify
     from werkzeug.exceptions import HTTPException
 
     @app.errorhandler(HTTPException)

@@ -39,6 +39,20 @@ frontend/.env
 .env
 .env.*
 *.env
+backend/.env
+backend/.env.local
+backend/.env.production
+
+# Security and secrets
+secrets/
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+*.pub
 
 # macOS
 .DS_Store
@@ -67,4 +81,14 @@ htmlcov/
 
 # Misc
 logs/
-*.log 
+*.log
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.backup
+*.old
+*.tmp 

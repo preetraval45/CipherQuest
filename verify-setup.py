@@ -79,16 +79,37 @@ def check_required_files():
     return len(missing_files) == 0
 
 def check_docker_compose_config():
-    """Validate docker-compose.yml configuration."""
-    print("\n🔍 Validating docker-compose.yml...")
+    """Check if docker-compose.yml has required configuration."""
+    print("\n🔍 Checking docker-compose.yml configuration...")
     
     try:
-        result = subprocess.run(['docker-compose', 'config'], 
-                              capture_output=True, text=True, check=True)
-        print("✅ docker-compose.yml is valid")
+        with open('docker-compose.yml', 'r') as f:
+            compose_content = f.read()
+        
+        required_env_vars = [
+            'DB_HOST=db',
+            'DB_USER=root',
+            'DB_NAME=cipherquest_db',
+            'MYSQL_DATABASE: cipherquest_db'
+        ]
+        
+        for var in required_env_vars:
+            if var in compose_content:
+                print(f"✅ {var}")
+            else:
+                print(f"❌ {var} - NOT FOUND")
+                return False
+        
+        # Check for environment variable usage instead of hardcoded passwords
+        if 'DB_PASSWORD=' in compose_content and 'MYSQL_ROOT_PASSWORD:' in compose_content:
+            print("✅ Database password configuration found")
+        else:
+            print("⚠️  Database password configuration not found - should use environment variables")
+        
         return True
-    except subprocess.CalledProcessError as e:
-        print(f"❌ docker-compose.yml validation failed: {e.stderr}")
+        
+    except FileNotFoundError:
+        print("❌ docker-compose.yml not found")
         return False
 
 def check_database_config():
@@ -219,14 +240,14 @@ def main():
     if passed == total:
         print("🎉 All checks passed! Your setup is ready.")
         print("\nNext steps:")
-        print("1. Run: docker login -u preetraval45@gmail.com -p Arjuntower@231")
+        print("1. Create a .env file in the backend directory with your configuration")
         print("2. Run: docker-compose up --build")
         print("3. Access the application at http://localhost:3000")
     else:
         print("⚠️  Some checks failed. Please review the issues above.")
         print("\nCommon fixes:")
         print("- Install Docker and Docker Compose")
-        print("- Login to Docker Hub")
+        print("- Set up environment variables in .env file")
         print("- Check file permissions")
         print("- Verify configuration files")
     

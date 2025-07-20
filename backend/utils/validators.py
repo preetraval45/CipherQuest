@@ -4,7 +4,8 @@ import unicodedata
 from typing import Optional, Dict, Any, List
 from urllib.parse import urlparse
 import bleach
-from werkzeug.security import safe_str_cmp
+import hmac
+import hashlib
 
 class ValidationError(Exception):
     """Custom exception for validation errors"""
@@ -479,4 +480,6 @@ def constant_time_compare(a: str, b: str) -> bool:
     Returns:
         bool: True if strings are equal, False otherwise
     """
-    return safe_str_cmp(a, b) 
+    if len(a) != len(b):
+        return False
+    return hmac.compare_digest(a.encode('utf-8'), b.encode('utf-8')) 

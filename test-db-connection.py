@@ -19,10 +19,16 @@ def test_database_connection():
         'host': os.getenv('DB_HOST', 'localhost'),
         'port': int(os.getenv('DB_PORT', 3306)),
         'user': os.getenv('DB_USER', 'root'),
-        'password': os.getenv('DB_PASSWORD', 'Arjun@231'),
+        'password': os.getenv('DB_PASSWORD'),
         'database': os.getenv('DB_NAME', 'cipherquest_db'),
         'charset': 'utf8mb4'
     }
+    
+    # Validate required environment variables
+    if not config['password']:
+        print("❌ Error: DB_PASSWORD environment variable is not set")
+        print("Please set DB_PASSWORD in your .env file")
+        return False
     
     print("Testing database connection with the following configuration:")
     print(f"Host: {config['host']}")

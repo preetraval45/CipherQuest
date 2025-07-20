@@ -9,307 +9,175 @@
 
 A modern, cyberpunk-themed cybersecurity learning platform built with HTML, CSS, and JavaScript.
 
-## 🎯 Overview
+---
 
-CipherQuest is an immersive cybersecurity education platform that combines gamified learning with AI-powered tutoring. The platform features a sleek cyberpunk design with glassmorphism effects, neon glows, and smooth animations.
+## 🛡️ Security Overview
 
-## ✨ Features
+CipherQuest is built with security as a top priority. The platform implements:
+- **Comprehensive security headers** (CSP, HSTS, X-Frame-Options, etc.)
+- **Strict environment variable management** (no hardcoded secrets)
+- **Rate limiting and CORS controls**
+- **Input validation and secure authentication**
+- **Automated security validation tools**
 
-### 🏠 Landing Page
+See [SECURITY.md](SECURITY.md) for full details on security practices, headers, and compliance.
 
-- **Hero Section**: Animated 3D cyber cube with glitch text effects
-- **Video Section**: Embedded platform introduction video
-- **Features Grid**: Interactive feature cards with hover animations
-- **Responsive Design**: Mobile-first approach with smooth transitions
-
-### 🔐 Authentication
-
-- **Login/Signup Forms**: Clean, minimal UI with glassmorphism effects
-- **OAuth Integration**: Google and GitHub authentication options
-- **Form Validation**: Real-time validation with error handling
-- **Password Toggle**: Show/hide password functionality
-- **Smooth Transitions**: Animated form switching
-
-### 📊 Dashboard
-
-- **User Profile Card**: XP, rank, badges, and progress tracking
-- **Quick Stats**: Real-time statistics with animated counters
-- **Activity Feed**: Recent user activity with status indicators
-- **Leaderboard**: Animated top hackers ranking
-- **Recommended Challenges**: Personalized challenge suggestions
-
-### 📚 Learning Modules
-
-- **Module Grid/List View**: Toggle between grid and list layouts
-- **Difficulty Filtering**: Filter modules by difficulty level
-- **Progress Tracking**: Visual progress indicators
-- **Module Cards**: Animated cards with tilt effects and glows
-- **Prerequisites**: Module dependency system
-
-### 🤖 AI Tutor
-
-- **Chat Interface**: Cyber terminal-styled chat
-- **Typing Effects**: Animated AI response typing
-- **Voice Controls**: Speech-to-text functionality
-- **Quick Actions**: Pre-defined learning prompts
-- **Code Highlighting**: Syntax-highlighted code blocks
-- **Chat Export**: Export conversation history
-
-## 🎨 Design System
-
-### Color Palette
-
-- **Primary**: `#00ff88` (Cyber Green)
-- **Secondary**: `#ff0080` (Neon Pink)
-- **Accent**: `#0080ff` (Electric Blue)
-- **Background**: `#0a0a0a` (Dark)
-- **Surface**: `rgba(255, 255, 255, 0.05)` (Glass)
-
-### Typography
-
-- **Primary**: Orbitron (Headings)
-- **Secondary**: Fira Code (Code/Monospace)
-- **Body**: Montserrat (Body text)
-
-### Effects
-
-- **Glassmorphism**: Backdrop blur with transparency
-- **Neon Glows**: CSS box-shadows with color
-- **Smooth Animations**: GSAP-powered transitions
-- **Hover Effects**: Scale, rotation, and glow animations
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-
+- Python 3.8+
+- Node.js 14+
+- Docker & Docker Compose (for full-stack deployment)
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- Local web server (optional, for development)
 
-### Installation
+### 1. Clone the repository
+```bash
+git clone https://github.com/yourusername/cipherquest.git
+cd cipherquest
+```
 
-1. **Clone the repository**
+### 2. Generate Secure Environment Variables
+Use the provided script to generate a secure `.env` file:
+```bash
+python generate-secrets.py
+```
+- This will create `backend/.env` with strong random secrets and passwords.
+- **Never commit `.env` files to version control!**
 
-   ```bash
-   git clone https://github.com/yourusername/cipherquest.git
-   cd cipherquest
-   ```
+### 3. Review & Customize Environment Variables
+- Edit `backend/.env` as needed (see [Environment Variables](#-environment-variables) below).
+- For production, use unique, strong secrets and passwords.
 
-2. **Open in browser**
-   - Simply open `index.html` in your browser
-   - Or use a local server for better development experience
+### 4. Install Dependencies
+```bash
+# Backend
+cd backend
+pip install -r requirements.txt
+cd ..
 
-3. **Using a local server (recommended)**
+# Frontend
+cd frontend
+npm install
+cd ..
+```
 
-   ```bash
-   # Using Python
-   python -m http.server 8000
-   
-   # Using Node.js (if you have http-server installed)
-   npx http-server
-   
-   # Using PHP
-   php -S localhost:8000
-   ```
+### 5. Run Security Validation (Recommended)
+Check your setup for common security issues:
+```bash
+python security-check.py
+```
+- This script checks for hardcoded secrets, missing environment variables, and security header configuration.
 
-4. **Access the application**
-   - Navigate to `http://localhost:8000`
-   - The application will load with all features
+### 6. Start the Application
+#### Local Development
+- **Backend:**
+  ```bash
+  cd backend
+  python run.py
+  ```
+- **Frontend:**
+  ```bash
+  cd frontend
+  npm start
+  ```
+- Access at [http://localhost:3000](http://localhost:3000)
+
+#### Docker Compose (Full Stack)
+```bash
+docker-compose up --build
+```
+- This will start the database, backend, and frontend with all secrets loaded from environment variables.
+
+---
+
+## 🌱 Environment Variables
+
+All secrets and sensitive configuration are loaded via environment variables. **No secrets are hardcoded.**
+
+A sample `.env` file is provided at `backend/env.example`. Use `generate-secrets.py` to create a secure `.env` file.
+
+**Example (`backend/.env`):**
+```env
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=cipherquest_db
+DB_USER=root
+DB_PASSWORD=your_secure_database_password_here
+
+# Flask Configuration
+SECRET_KEY=your-super-secret-key-change-this-in-production-minimum-32-characters
+JWT_SECRET_KEY=your-jwt-secret-key-change-this-in-production-minimum-32-characters
+
+# Security Configuration
+BCRYPT_LOG_ROUNDS=12
+RATE_LIMIT_PER_MINUTE=60
+
+# CORS Configuration
+CORS_ORIGINS=http://localhost:3000,https://yourdomain.com
+CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS
+CORS_ALLOW_HEADERS=Content-Type,Authorization,X-Requested-With
+
+# Docker
+MYSQL_ROOT_PASSWORD=your_secure_mysql_root_password
+```
+
+**See [backend/env.example](backend/env.example) for all available variables.**
+
+---
+
+## 🔒 Security Best Practices
+- **All secrets are loaded from environment variables** (never hardcoded)
+- **Comprehensive security headers** are set in both backend (Flask) and frontend (nginx)
+- **CORS is restricted** to trusted origins
+- **Rate limiting** is enabled on all API endpoints
+- **Input validation** and **output encoding** are enforced
+- **.env and other sensitive files are gitignored**
+- **Automated security validation** with `security-check.py`
+- **See [SECURITY.md](SECURITY.md) for full details and checklist**
+
+---
 
 ## 📁 Project Structure
 
 CipherQuest/
 ├── assets/
-│   ├── fonts/
-│   └── images/
 ├── backend/
 │   ├── app.py
-│   ├── CipherQuest_API.postman_collection.json
 │   ├── config.py
 │   ├── env.example
-│   ├── init_db.py
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── challenge.py
-│   │   ├── leaderboard.py
-│   │   ├── module.py
-│   │   ├── progress.py
-│   │   └── user.py
-│   ├── README.md
-│   ├── requirements.txt
-│   ├── routes/
-│   │   ├── __init__.py
-│   │   ├── admin.py
-│   │   ├── auth.py
-│   │   ├── challenges.py
-│   │   ├── leaderboard.py
-│   │   ├── modules.py
-│   │   └── user.py
-│   ├── run.py
-│   ├── setup.py
-│   └── utils/
-│       ├── __init__.py
-│       └── validators.py
-├── css/
-│   ├── animations.css
-│   ├── auth.css
-│   ├── dashboard.css
-│   ├── modules.css
-│   └── style.css
-├── docs/
+│   ├── .env  # (generated, gitignored)
+│   ├── generate-secrets.py
+│   ├── security-check.py
+│   ├── SECURITY.md
+│   ├── ...
 ├── frontend/
-│   ├── package-lock.json
-│   ├── package.json
-│   ├── public/
-│   ├── README.md
-│   └── src/
-│       ├── App.css
-│       ├── App.js
-│       ├── components/
-│       │   ├── auth/
-│       │   │   └── ProtectedRoute.js
-│       │   └── layout/
-│       │       ├── Layout.css
-│       │       └── Layout.js
-│       ├── index.css
-│       ├── index.js
-│       ├── pages/
-│       │   ├── AIAssistantPage.css
-│       │   ├── AIAssistantPage.js
-│       │   ├── DashboardPage.css
-│       │   ├── DashboardPage.js
-│       │   ├── LoginPage.css
-│       │   ├── LoginPage.js
-│       │   ├── ModulesPage.css
-│       │   ├── ModulesPage.js
-│       │   ├── ProfilePage.css
-│       │   └── ProfilePage.js
-│       └── styles
-├── js/
-│   ├── ai-tutor.js
-│   ├── auth.js
-│   ├── dashboard.js
-│   ├── main.js
-│   └── modules.js
-├── legacy/
-│   ├── ai-tutor.html
-│   ├── dashboard.html
-│   ├── index.html
-│   ├── login.html
-│   └── modules.html
-├── Dockerfile
+│   ├── nginx.conf
+│   ├── ...
+├── docker-compose.yml
+├── .gitignore
 ├── README.md
 
-## 🎮 Usage Guide
-
-### Navigation
-
-- **Sidebar**: Access different sections (Dashboard, Modules, CTF Labs, AI Tutor, Profile)
-- **Top Bar**: View notifications, user menu, and section-specific controls
-- **Responsive**: Mobile-friendly navigation with hamburger menu
-
-### Learning Flow
-
-1. **Start**: Visit the landing page and click "Start Learning"
-2. **Register**: Create an account or login with OAuth
-3. **Dashboard**: View your progress and recommended content
-4. **Modules**: Browse learning modules by difficulty and category
-5. **AI Tutor**: Get personalized help and explanations
-6. **Practice**: Complete challenges and earn XP
-
-### AI Tutor Features
-
-- **Ask Questions**: Type any cybersecurity-related question
-- **Quick Actions**: Use predefined prompts for common topics
-- **Voice Input**: Click the microphone button for voice commands
-- **Code Examples**: View syntax-highlighted code with copy functionality
-- **Export Chat**: Download conversation history
-
-## 🛠️ Customization
-
-### Adding New Modules
-
-1. Edit `modules.html` to add new module cards
-2. Update `css/modules.css` for styling
-3. Modify `js/modules.js` for interactions
-
-### Customizing Colors
-
-1. Edit CSS variables in `css/style.css`
-2. Update the `:root` selector with your color scheme
-3. All components will automatically use the new colors
-
-### Adding Animations
-
-1. Define new animations in `css/animations.css`
-2. Use GSAP for complex animations in JavaScript files
-3. Apply classes or call animation functions as needed
-
-## 🔧 Development
-
-### Browser Support
-
-- Chrome 80+
-- Firefox 75+
-- Safari 13+
-- Edge 80+
-
-### Performance
-
-- Optimized animations with GSAP
-- Efficient DOM manipulation
-- Lazy loading for better performance
-- Responsive images and assets
-
-### Accessibility
-
-- Semantic HTML structure
-- ARIA labels and roles
-- Keyboard navigation support
-- High contrast color scheme
-- Screen reader compatibility
-
-## 🎯 Future Enhancements
-
-### Planned Features
-
-- **Real-time Collaboration**: Multi-user CTF challenges
-- **Advanced AI**: Integration with GPT-4 or similar
-- **Progress Analytics**: Detailed learning analytics
-- **Mobile App**: React Native or Flutter app
-- **Backend Integration**: User authentication and data persistence
-- **Video Lessons**: Embedded video content
-- **Achievement System**: More badges and rewards
-- **Community Features**: Forums and discussion boards
-
-### Technical Improvements
-
-- **PWA Support**: Progressive Web App capabilities
-- **Offline Mode**: Service worker for offline access
-- **Performance**: Code splitting and lazy loading
-- **Testing**: Unit and integration tests
-- **CI/CD**: Automated deployment pipeline
+---
 
 ## 🤝 Contributing
-
 We welcome contributions from the community!
-
 - See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/contributing.md](docs/contributing.md) for guidelines.
 - Please follow the code of conduct in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 - Open issues and pull requests to help improve CipherQuest.
 
 ## 📄 License
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
-
 - **Fonts**: Google Fonts (Orbitron, Fira Code, Montserrat)
 - **Icons**: Font Awesome
 - **Animations**: GSAP (GreenSock)
 - **Design Inspiration**: Cyberpunk aesthetics and modern web design trends
 
 ## 📞 Support
-
 - **Issues**: Report bugs and feature requests via GitHub Issues
 - **Discussions**: Join community discussions on GitHub Discussions
 - **Email**: Contact the development team for support
