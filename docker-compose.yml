@@ -1,0 +1,67 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Arjun@231
+      MYSQL_DATABASE: cipherquest_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - cipherquest-network
+
+  backend:
+    build: ./backend
+    container_name: cipherquest-backend
+    restart: always
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=cipherquest_db
+      - DB_USER=root
+      - DB_PASSWORD=Arjun@231
+      - SECRET_KEY=your_secure_flask_secret
+      - OPENAI_API_KEY=your_api_key_if_used
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    networks:
+      - cipherquest-network
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "
+        echo 'Waiting for database to be ready...'
+        while ! nc -z db 3306; do
+          sleep 1
+        done
+        echo 'Database is ready!'
+        python run.py
+      "
+
+  frontend:
+    build: ./frontend
+    container_name: cipherquest-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - cipherquest-network
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  db_data:
+
+networks:
+  cipherquest-network:
+    driver: bridge 

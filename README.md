@@ -1,8 +1,11 @@
 # CipherQuest - Hack. Learn. Level Up
 
 [![Build Status](https://github.com/preetraval45/CipherQuest/actions/workflows/ci.yml/badge.svg)](https://github.com/preetraval45/CipherQuest/actions)
+[![Codecov Coverage](https://codecov.io/gh/preetraval45/CipherQuest/branch/main/graph/badge.svg)](https://codecov.io/gh/preetraval45/CipherQuest)
+[![Docker Build](https://img.shields.io/docker/cloud/build/preetraval45/cipherquest-backend?label=Backend%20Docker)](https://hub.docker.com/r/preetraval45/cipherquest-backend)
+[![Vercel Deploy](https://vercelbadge.vercel.app/api?app=cipherquest-frontend)](https://cipherquest-frontend.vercel.app/)
+[![Heroku Deploy](https://img.shields.io/badge/dynamic/json?color=430098&label=Heroku%20API&query=%24.status&url=https%3A%2F%2Fapi.heroku.com%2Fapps%2F${{ secrets.HEROKU_APP_NAME }}&logo=heroku)](https://dashboard.heroku.com/apps)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Coverage Status](https://img.shields.io/badge/coverage-unknown-lightgrey)](https://github.com/preetraval45/CipherQuest)
 
 A modern, cyberpunk-themed cybersecurity learning platform built with HTML, CSS, and JavaScript.
 

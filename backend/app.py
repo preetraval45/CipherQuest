@@ -33,7 +33,7 @@ from routes.docs import docs_bp
 
 def create_app(config_name='default'):
     """Application factory pattern"""
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config[config_name])
     
     # Initialize extensions

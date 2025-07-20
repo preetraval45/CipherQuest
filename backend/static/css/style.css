@@ -1,0 +1,116 @@
+/* CipherQuest Backend Static Styles */
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: #0a0a0a;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+/* Error pages styling */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.error-code {
+  font-size: 6rem;
+  font-weight: bold;
+  color: #00ff88;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  font-size: 1.5rem;
+  color: #cccccc;
+  margin-bottom: 2rem;
+}
+
+.error-description {
+  color: #888888;
+  max-width: 600px;
+  margin-bottom: 2rem;
+}
+
+.back-link {
+  color: #00ff88;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: #00cc6a;
+}
+
+/* API documentation styling */
+.api-docs {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.api-docs h1 {
+  color: #00ff88;
+  margin-bottom: 2rem;
+}
+
+.api-endpoint {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.endpoint-method {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.method-get { background: #00ff88; color: #000; }
+.method-post { background: #0080ff; color: #fff; }
+.method-put { background: #ff8000; color: #fff; }
+.method-delete { background: #ff0080; color: #fff; }
+
+.endpoint-url {
+  font-family: 'Fira Code', monospace;
+  color: #00ff88;
+  margin-bottom: 1rem;
+}
+
+.endpoint-description {
+  color: #cccccc;
+  margin-bottom: 1rem;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #00ff88;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+} 

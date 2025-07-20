@@ -6,8 +6,13 @@
 - [ ] Question
 
 ## Description
-
 _Describe the issue or feature in detail._
+
+## Environment
+- OS:
+- Browser/Version:
+- Device:
+- Branch/Commit:
 
 ## Steps to Reproduce (for bugs)
 1. 
@@ -15,13 +20,19 @@ _Describe the issue or feature in detail._
 3. 
 
 ## Expected Behavior
-
 _What did you expect to happen?_
 
 ## Actual Behavior
-
 _What actually happened?_
 
-## Additional Information
+## Screenshots/Logs
+_If applicable, add screenshots or log output to help explain your problem._
 
-_Any other context, logs, or screenshots?_ 
+## Checklist
+- [ ] I have searched for existing issues
+- [ ] I have provided all necessary information
+- [ ] I have attached relevant logs/screenshots
+- [ ] I have described how to reproduce the issue
+
+## Additional Information
+_Any other context, links, or details?_ 
