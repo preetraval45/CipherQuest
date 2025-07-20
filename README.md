@@ -111,25 +111,86 @@ CipherQuest is an immersive cybersecurity education platform that combines gamif
 ## 📁 Project Structure
 
 CipherQuest/
-├── index.html              # Landing page
-├── login.html              # Authentication page
-├── dashboard.html          # User dashboard
-├── modules.html            # Learning modules
-├── ai-tutor.html           # AI tutor interface
+├── assets/
+│   ├── fonts/
+│   └── images/
+├── backend/
+│   ├── app.py
+│   ├── CipherQuest_API.postman_collection.json
+│   ├── config.py
+│   ├── env.example
+│   ├── init_db.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── challenge.py
+│   │   ├── leaderboard.py
+│   │   ├── module.py
+│   │   ├── progress.py
+│   │   └── user.py
+│   ├── README.md
+│   ├── requirements.txt
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── auth.py
+│   │   ├── challenges.py
+│   │   ├── leaderboard.py
+│   │   ├── modules.py
+│   │   └── user.py
+│   ├── run.py
+│   ├── setup.py
+│   └── utils/
+│       ├── __init__.py
+│       └── validators.py
 ├── css/
-│   ├── style.css           # Main stylesheet
-│   ├── animations.css      # Animation definitions
-│   ├── auth.css            # Authentication styles
-│   ├── dashboard.css       # Dashboard styles
-│   ├── modules.css         # Module styles
-│   └── ai-tutor.css        # AI tutor styles
+│   ├── animations.css
+│   ├── auth.css
+│   ├── dashboard.css
+│   ├── modules.css
+│   └── style.css
+├── docs/
+├── frontend/
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public/
+│   ├── README.md
+│   └── src/
+│       ├── App.css
+│       ├── App.js
+│       ├── components/
+│       │   ├── auth/
+│       │   │   └── ProtectedRoute.js
+│       │   └── layout/
+│       │       ├── Layout.css
+│       │       └── Layout.js
+│       ├── index.css
+│       ├── index.js
+│       ├── pages/
+│       │   ├── AIAssistantPage.css
+│       │   ├── AIAssistantPage.js
+│       │   ├── DashboardPage.css
+│       │   ├── DashboardPage.js
+│       │   ├── LoginPage.css
+│       │   ├── LoginPage.js
+│       │   ├── ModulesPage.css
+│       │   ├── ModulesPage.js
+│       │   ├── ProfilePage.css
+│       │   └── ProfilePage.js
+│       └── styles
 ├── js/
-│   ├── main.js             # Main JavaScript
-│   ├── auth.js             # Authentication logic
-│   ├── dashboard.js        # Dashboard functionality
-│   ├── modules.js          # Module interactions
-│   └── ai-tutor.js         # AI tutor features
-└── README.md               # Project documentation
+│   ├── ai-tutor.js
+│   ├── auth.js
+│   ├── dashboard.js
+│   ├── main.js
+│   └── modules.js
+├── legacy/
+│   ├── ai-tutor.html
+│   ├── dashboard.html
+│   ├── index.html
+│   ├── login.html
+│   └── modules.html
+├── Dockerfile
+├── README.md
 
 ## 🎮 Usage Guide
 

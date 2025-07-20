@@ -1,0 +1,12 @@
+/* ===== DASHBOARD STYLES ===== */
+
+/* ===== PROGRESS FILL CLASSES ===== */
+.progress-fill-82 {
+    width: 81.7% !important;
+}
+
+/* ===== LAYOUT ===== */
+body {
+    display: flex;
+    min-height: 100vh;
+} 

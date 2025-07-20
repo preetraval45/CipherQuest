@@ -6,7 +6,7 @@ Flask-CORS==4.0.0
 Flask-Limiter==3.5.0
 Flask-Bcrypt==1.0.1
 PyMySQL==1.1.0
-python-dotenv==1.0.0
+python-dotenv>=0.21.0
 marshmallow==3.20.1
 marshmallow-sqlalchemy==0.29.0
 Werkzeug==2.3.7

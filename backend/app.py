@@ -9,6 +9,10 @@ from flask_bcrypt import Bcrypt
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if present
+load_dotenv()
 
 from config import config
 from models.user import db as user_db, bcrypt
@@ -74,18 +78,56 @@ def create_app(config_name='default'):
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     
     # Error handlers
+    from flask import jsonify
+    from werkzeug.exceptions import HTTPException
+
+    @app.errorhandler(HTTPException)
+    def handle_http_exception(error):
+        """Handle generic HTTP exceptions with JSON response."""
+        response = error.get_response()
+        response.data = jsonify({
+            'error': error.name,
+            'description': error.description
+        }).data
+        response.content_type = "application/json"
+        return response, error.code
+
     @app.errorhandler(404)
     def not_found(error):
-        return {'error': 'Not found'}, 404
-    
+        """Handle 404 Not Found errors."""
+        return jsonify({'error': 'Not found'}), 404
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        """Handle 400 Bad Request errors."""
+        return jsonify({'error': 'Bad request'}), 400
+
+    @app.errorhandler(401)
+    def unauthorized(error):
+        """Handle 401 Unauthorized errors."""
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    @app.errorhandler(403)
+    def forbidden(error):
+        """Handle 403 Forbidden errors."""
+        return jsonify({'error': 'Forbidden'}), 403
+
+    @app.errorhandler(429)
+    def ratelimit_handler(error):
+        """Handle 429 Too Many Requests errors."""
+        return jsonify({'error': 'Rate limit exceeded'}), 429
+
     @app.errorhandler(500)
     def internal_error(error):
+        """Handle 500 Internal Server Error and rollback DB session."""
         db.session.rollback()
-        return {'error': 'Internal server error'}, 500
-    
-    @app.errorhandler(429)
-    def ratelimit_handler(e):
-        return {'error': 'Rate limit exceeded'}, 429
+        return jsonify({'error': 'Internal server error'}), 500
+
+    @app.errorhandler(Exception)
+    def handle_unexpected_error(error):
+        """Handle uncaught exceptions with a generic message."""
+        app.logger.error(f"Unhandled Exception: {error}")
+        return jsonify({'error': 'An unexpected error occurred'}), 500
     
     # Health check endpoint
     @app.route('/api/health')
