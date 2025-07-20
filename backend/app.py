@@ -28,6 +28,8 @@ from routes.modules import modules_bp
 from routes.challenges import challenges_bp
 from routes.leaderboard import leaderboard_bp
 from routes.admin import admin_bp
+from routes.ai import ai_bp
+from routes.docs import docs_bp
 
 def create_app(config_name='default'):
     """Application factory pattern"""
@@ -76,6 +78,8 @@ def create_app(config_name='default'):
     app.register_blueprint(challenges_bp, url_prefix='/api/challenges')
     app.register_blueprint(leaderboard_bp, url_prefix='/api/leaderboard')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
+    app.register_blueprint(ai_bp, url_prefix='/api/ai')
+    app.register_blueprint(docs_bp, url_prefix='/api')
     
     # Error handlers
     from flask import jsonify

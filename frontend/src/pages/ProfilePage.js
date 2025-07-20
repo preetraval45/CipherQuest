@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ProfilePage.css';
 
 const ProfilePage = () => {
-  const [profile] = useState({
+  const [profile, setProfile] = useState({
     username: 'CyberHacker',
     email: 'hacker@cipherquest.com',
     level: 5,
@@ -11,6 +11,11 @@ const ProfilePage = () => {
     bio: 'Passionate cybersecurity enthusiast learning ethical hacking and network security.',
     avatar: '👤'
   });
+  const [editProfile, setEditProfile] = useState(profile);
+  const [editing, setEditing] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState(null);
+  const [editSuccess, setEditSuccess] = useState(false);
 
   const [achievements, setAchievements] = useState([]);
   const [stats, setStats] = useState({});
@@ -20,7 +25,6 @@ const ProfilePage = () => {
     // Simulate loading profile data
     const loadProfileData = async () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
       setAchievements([
         { id: 1, name: 'First Blood', description: 'Complete your first challenge', icon: '🩸', earned: true, date: '2024-01-20' },
         { id: 2, name: 'Code Breaker', description: 'Solve 10 cryptography challenges', icon: '🔓', earned: true, date: '2024-02-05' },
@@ -29,7 +33,6 @@ const ProfilePage = () => {
         { id: 5, name: 'CTF Champion', description: 'Win a CTF competition', icon: '🏆', earned: false, date: null },
         { id: 6, name: 'Bug Hunter', description: 'Find and report 5 vulnerabilities', icon: '🐛', earned: false, date: null }
       ]);
-
       setStats({
         totalChallenges: 28,
         modulesCompleted: 12,
@@ -40,9 +43,12 @@ const ProfilePage = () => {
         rank: 'Advanced'
       });
     };
-
     loadProfileData();
   }, []);
+
+  useEffect(() => {
+    setEditProfile(profile);
+  }, [profile]);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📊' },
@@ -50,6 +56,45 @@ const ProfilePage = () => {
     { id: 'stats', label: 'Statistics', icon: '📈' },
     { id: 'settings', label: 'Settings', icon: '⚙️' }
   ];
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditProfile(prev => ({ ...prev, [name]: value }));
+    setEditError(null);
+    setEditSuccess(false);
+  };
+
+  const validateEdit = () => {
+    if (!editProfile.username.trim()) return 'Username is required.';
+    if (!editProfile.email.trim()) return 'Email is required.';
+    if (!/\S+@\S+\.\S+/.test(editProfile.email)) return 'Email is invalid.';
+    return null;
+  };
+
+  const handleEditSave = async (e) => {
+    e.preventDefault();
+    setEditError(null);
+    setEditSuccess(false);
+    const validationError = validateEdit();
+    if (validationError) {
+      setEditError(validationError);
+      return;
+    }
+    setEditLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setProfile(editProfile);
+    setEditLoading(false);
+    setEditing(false);
+    setEditSuccess(true);
+  };
+
+  const handleEditCancel = () => {
+    setEditProfile(profile);
+    setEditing(false);
+    setEditError(null);
+    setEditSuccess(false);
+  };
 
   const renderOverview = () => (
     <div className="overview-content">
@@ -206,41 +251,65 @@ const ProfilePage = () => {
   );
 
   const renderSettings = () => (
-    <div className="settings-content">
+    <div className="settings-content" role="region" aria-label="Account Settings">
       <div className="settings-section glass-effect">
         <h3>Account Settings</h3>
-        <div className="setting-item">
-          <label htmlFor="username" className="setting-label">Username</label>
-          <input 
-            id="username"
-            type="text" 
-            value={profile.username} 
-            className="setting-input"
-            readOnly
-          />
-        </div>
-        <div className="setting-item">
-          <label htmlFor="email" className="setting-label">Email</label>
-          <input 
-            id="email"
-            type="email" 
-            value={profile.email} 
-            className="setting-input"
-            readOnly
-          />
-        </div>
-        <div className="setting-item">
-          <label htmlFor="bio" className="setting-label">Bio</label>
-          <textarea 
-            id="bio"
-            value={profile.bio} 
-            className="setting-textarea"
-            rows="3"
-            readOnly
-          />
-        </div>
+        <form onSubmit={handleEditSave} className="profile-edit-form" aria-label="Edit profile form">
+          <div className="setting-item">
+            <label htmlFor="username" className="setting-label">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              value={editProfile.username}
+              className="setting-input"
+              onChange={handleEditChange}
+              readOnly={!editing}
+              aria-required="true"
+              aria-label="Username"
+            />
+          </div>
+          <div className="setting-item">
+            <label htmlFor="email" className="setting-label">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={editProfile.email}
+              className="setting-input"
+              onChange={handleEditChange}
+              readOnly={!editing}
+              aria-required="true"
+              aria-label="Email"
+            />
+          </div>
+          <div className="setting-item">
+            <label htmlFor="bio" className="setting-label">Bio</label>
+            <textarea
+              id="bio"
+              name="bio"
+              value={editProfile.bio}
+              className="setting-textarea"
+              rows="3"
+              onChange={handleEditChange}
+              readOnly={!editing}
+              aria-label="Bio"
+            />
+          </div>
+          {editing ? (
+            <div className="edit-actions">
+              <button type="submit" className="save-btn" disabled={editLoading} aria-busy={editLoading} aria-label="Save profile">
+                {editLoading ? <span className="loading-spinner" aria-hidden="true"></span> : 'Save'}
+              </button>
+              <button type="button" className="cancel-btn" onClick={handleEditCancel} disabled={editLoading} aria-label="Cancel editing">Cancel</button>
+            </div>
+          ) : (
+            <button type="button" className="edit-btn" onClick={() => setEditing(true)} aria-label="Edit profile">Edit</button>
+          )}
+          {editError && <div className="error-message" role="alert">{editError}</div>}
+          {editSuccess && <div className="success-message" role="status">Profile updated successfully!</div>}
+        </form>
       </div>
-
       <div className="settings-section glass-effect">
         <h3>Preferences</h3>
         <div className="setting-item">
@@ -269,7 +338,6 @@ const ProfilePage = () => {
         <h1 className="page-title">Profile</h1>
         <p className="page-subtitle">Manage your account and view your progress</p>
       </div>
-
       {/* Tab Navigation */}
       <div className="tab-navigation glass-effect">
         {tabs.map((tab) => (
@@ -277,13 +345,14 @@ const ProfilePage = () => {
             key={tab.id}
             className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.id)}
+            aria-pressed={activeTab === tab.id}
+            aria-label={tab.label}
           >
             <span className="tab-icon">{tab.icon}</span>
             <span className="tab-label">{tab.label}</span>
           </button>
         ))}
       </div>
-
       {/* Tab Content */}
       <div className="tab-content">
         {activeTab === 'overview' && renderOverview()}

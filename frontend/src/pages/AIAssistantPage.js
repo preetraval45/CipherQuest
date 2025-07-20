@@ -1,6 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './AIAssistantPage.css';
 
+const MODEL_OPTIONS = [
+  { label: 'GPT-3.5 Turbo', value: 'gpt-3.5-turbo' },
+  { label: 'GPT-4', value: 'gpt-4' },
+];
+
+const DEFAULT_MODEL = 'gpt-3.5-turbo';
+const DEFAULT_TEMPERATURE = 0.7;
+
 const AIAssistantPage = () => {
   const [messages, setMessages] = useState([
     {
@@ -13,6 +21,10 @@ const AIAssistantPage = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [error, setError] = useState(null);
+  const [model, setModel] = useState(DEFAULT_MODEL);
+  const [temperature, setTemperature] = useState(DEFAULT_TEMPERATURE);
+  const [streaming, setStreaming] = useState(false);
   const messagesEndRef = useRef(null);
 
   const quickActions = [
@@ -32,7 +44,8 @@ const AIAssistantPage = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || isTyping) return;
+    setError(null);
 
     const userMessage = {
       id: Date.now(),
@@ -45,57 +58,45 @@ const AIAssistantPage = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate AI response delay
-    setTimeout(() => {
-      const aiResponse = generateAIResponse(inputMessage);
-      setMessages(prev => [...prev, aiResponse]);
-      setIsTyping(false);
-    }, 1500);
-  };
-
-  const generateAIResponse = (userInput) => {
-    const responses = {
-      'encryption': {
-        content: `**Encryption** is the process of converting plain text into ciphertext to protect sensitive information.\n\n**Types of Encryption:**\n• **Symmetric**: Same key for encryption/decryption (AES, DES)\n• **Asymmetric**: Public/private key pairs (RSA, ECC)\n\n**Example (Caesar Cipher):**\n\`\`\`python\n# Simple Caesar cipher implementation\ndef caesar_encrypt(text, shift):\n    result = ""\n    for char in text:\n        if char.isalpha():\n            ascii_offset = 65 if char.isupper() else 97\n            result += chr((ord(char) - ascii_offset + shift) % 26 + ascii_offset)\n        else:\n            result += char\n    return result\n\`\`\``,
-        type: 'ai'
-      },
-      'sql injection': {
-        content: `**SQL Injection** is a code injection technique that exploits vulnerabilities in database queries.\n\n**Common Types:**\n• Union-based\n• Boolean-based\n• Time-based\n• Error-based\n\n**Prevention:**\n• Use parameterized queries\n• Input validation\n• Least privilege principle\n• WAF (Web Application Firewall)\n\n**Example Prevention:**\n\`\`\`python\n# Vulnerable code\nquery = f"SELECT * FROM users WHERE id = {user_input}"\n\n# Secure code\nquery = "SELECT * FROM users WHERE id = %s"\ncursor.execute(query, (user_input,))\n\`\`\``,
-        type: 'ai'
-      },
-      'xss': {
-        content: `**Cross-Site Scripting (XSS)** allows attackers to inject malicious scripts into web pages.\n\n**Types:**\n• **Reflected XSS**: Script reflected in response\n• **Stored XSS**: Script stored in database\n• **DOM XSS**: Script executed in DOM\n\n**Prevention:**\n• Input sanitization\n• Output encoding\n• Content Security Policy (CSP)\n• HttpOnly cookies\n\n**Example:**\n\`\`\`html\n<!-- Vulnerable -->\n<div id="user-input">${userInput}</div>\n\n<!-- Secure -->\n<div id="user-input">${userInput.replace(/[&<>"']/g, (match) => {\n  const escapeMap = {\n    '&': '&amp;',\n    '<': '&lt;',\n    '>': '&gt;',\n    '"': '&quot;',\n    "'": '&#39;'\n  };\n  return escapeMap[match];\n})}</div>\n\`\`\``,
-        type: 'ai'
-      },
-      'network security': {
-        content: `**Network Security** protects network infrastructure and data from unauthorized access.\n\n**Key Concepts:**\n• **Firewalls**: Control traffic flow\n• **VPNs**: Secure remote access\n• **IDS/IPS**: Intrusion detection/prevention\n• **Encryption**: Data protection\n\n**Common Threats:**\n• Man-in-the-Middle attacks\n• DDoS attacks\n• Packet sniffing\n• ARP spoofing\n\n**Best Practices:**\n• Regular security updates\n• Network segmentation\n• Access control\n• Monitoring and logging`,
-        type: 'ai'
-      },
-      'ctf': {
-        content: `**Capture The Flag (CTF)** challenges test cybersecurity skills in a competitive environment.\n\n**Challenge Types:**\n• **Web**: Web application vulnerabilities\n• **Forensics**: File analysis and recovery\n• **Crypto**: Cryptography challenges\n• **Pwn**: Binary exploitation\n• **Reverse**: Reverse engineering\n\n**Example Challenge:**\n\`\`\`\nFlag format: CTF{...}\nChallenge: Decrypt this message\nCiphertext: "KHOOR ZRUOG"\nHint: Think about shifting letters\n\`\`\`\n\n**Tools:**\n• Burp Suite (Web)\n• Wireshark (Network)\n• Ghidra (Reverse)\n• CyberChef (Crypto)`,
-        type: 'ai'
-      }
-    };
-
-    const lowerInput = userInput.toLowerCase();
-    for (const [key, response] of Object.entries(responses)) {
-      if (lowerInput.includes(key)) {
-        return {
-          id: Date.now(),
-          content: response.content,
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: userMessage.content,
+          model,
+          temperature,
+          stream: streaming
+        })
+      });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setError(data.error || 'An error occurred.');
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          content: `❌ ${data.error || 'An error occurred.'}`,
           timestamp: new Date(),
-          type: response.type
-        };
+          type: 'ai'
+        }]);
+      } else {
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          content: data.response,
+          timestamp: new Date(),
+          type: 'ai'
+        }]);
       }
+    } catch (err) {
+      setError('Network error. Please try again.');
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        content: '❌ Network error. Please try again.',
+        timestamp: new Date(),
+        type: 'ai'
+      }]);
+    } finally {
+      setIsTyping(false);
     }
-
-    // Default response
-    return {
-      id: Date.now(),
-      content: `I understand you're asking about "${userInput}". This is a great cybersecurity topic! Let me provide you with some information and resources to help you learn more.\n\n**Key Points:**\n• Always practice ethical hacking\n• Stay updated with latest threats\n• Use proper tools and techniques\n• Follow responsible disclosure\n\nWould you like me to elaborate on any specific aspect of this topic?`,
-      timestamp: new Date(),
-      type: 'ai'
-    };
   };
 
   const handleQuickAction = (action) => {
@@ -119,6 +120,18 @@ const AIAssistantPage = () => {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleClearChat = () => {
+    setMessages([
+      {
+        id: 1,
+        content: "Hello! I'm your CyberAI Tutor. I can help you learn about cybersecurity, cryptography, web security, and more. What would you like to know?",
+        timestamp: new Date(),
+        type: 'ai'
+      }
+    ]);
+    setError(null);
   };
 
   const formatMessage = (content) => {
@@ -147,12 +160,52 @@ const AIAssistantPage = () => {
           </div>
         </div>
         <div className="ai-controls">
-          <button className="control-btn" title="Export Chat">
+          <button className="control-btn" title="Export Chat" disabled>
             📥
           </button>
-          <button className="control-btn" title="Clear Chat">
+          <button className="control-btn" title="Clear Chat" onClick={handleClearChat}>
             🗑️
           </button>
+        </div>
+      </div>
+
+      {/* Settings */}
+      <div className="ai-settings glass-effect">
+        <div className="setting-group">
+          <label htmlFor="model-select">Model:</label>
+          <select
+            id="model-select"
+            value={model}
+            onChange={e => setModel(e.target.value)}
+            disabled={isTyping}
+          >
+            {MODEL_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="setting-group">
+          <label htmlFor="temperature-range">Temperature: {temperature}</label>
+          <input
+            id="temperature-range"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={temperature}
+            onChange={e => setTemperature(Number(e.target.value))}
+            disabled={isTyping}
+          />
+        </div>
+        <div className="setting-group">
+          <label htmlFor="streaming-checkbox">Streaming:</label>
+          <input
+            id="streaming-checkbox"
+            type="checkbox"
+            checked={streaming}
+            onChange={e => setStreaming(e.target.checked)}
+            disabled={isTyping}
+          />
         </div>
       </div>
 
@@ -163,6 +216,7 @@ const AIAssistantPage = () => {
             key={`action-${action}`}
             className="quick-action-btn"
             onClick={() => handleQuickAction(action)}
+            disabled={isTyping}
           >
             {action}
           </button>
@@ -193,7 +247,6 @@ const AIAssistantPage = () => {
               </div>
             </div>
           ))}
-          
           {isTyping && (
             <div className="message ai">
               <div className="message-avatar">🤖</div>
@@ -206,10 +259,17 @@ const AIAssistantPage = () => {
               </div>
             </div>
           )}
-          
           <div ref={messagesEndRef} />
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="error-container">
+          <div className="error-icon">⚠️</div>
+          <div className="error-message">{error}</div>
+        </div>
+      )}
 
       {/* Input Area */}
       <div className="input-container glass-effect">
@@ -221,19 +281,21 @@ const AIAssistantPage = () => {
             placeholder="Ask me anything about cybersecurity..."
             className="message-input"
             rows="1"
+            disabled={isTyping}
           />
           <div className="input-actions">
             <button
               className={`voice-btn ${isListening ? 'listening' : ''}`}
               onClick={handleVoiceInput}
               title="Voice Input"
+              disabled={isTyping}
             >
               {isListening ? '🔴' : '🎤'}
             </button>
             <button
               className="send-btn"
               onClick={handleSendMessage}
-              disabled={!inputMessage.trim()}
+              disabled={!inputMessage.trim() || isTyping}
             >
               ➤
             </button>

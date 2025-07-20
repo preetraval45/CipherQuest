@@ -7,6 +7,7 @@ import DashboardPage from './pages/DashboardPage';
 import ModulesPage from './pages/ModulesPage';
 import AIAssistantPage from './pages/AIAssistantPage';
 import ProfilePage from './pages/ProfilePage';
+import ErrorBoundary from './components/layout/ErrorBoundary';
 import './App.css';
 
 function App() {
@@ -14,8 +15,11 @@ function App() {
     <div className="App">
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        
+        <Route path="/login" element={
+          <ErrorBoundary>
+            <LoginPage />
+          </ErrorBoundary>
+        } />
         {/* Protected Routes */}
         <Route path="/" element={
           <ProtectedRoute>
@@ -24,39 +28,42 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
-        
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Layout>
-              <DashboardPage />
+              <ErrorBoundary>
+                <DashboardPage />
+              </ErrorBoundary>
             </Layout>
           </ProtectedRoute>
         } />
-        
         <Route path="/modules" element={
           <ProtectedRoute>
             <Layout>
-              <ModulesPage />
+              <ErrorBoundary>
+                <ModulesPage />
+              </ErrorBoundary>
             </Layout>
           </ProtectedRoute>
         } />
-        
         <Route path="/ai-tutor" element={
           <ProtectedRoute>
             <Layout>
-              <AIAssistantPage />
+              <ErrorBoundary>
+                <AIAssistantPage />
+              </ErrorBoundary>
             </Layout>
           </ProtectedRoute>
         } />
-        
         <Route path="/profile" element={
           <ProtectedRoute>
             <Layout>
-              <ProfilePage />
+              <ErrorBoundary>
+                <ProfilePage />
+              </ErrorBoundary>
             </Layout>
           </ProtectedRoute>
         } />
-        
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

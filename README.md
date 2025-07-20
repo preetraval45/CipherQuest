@@ -1,5 +1,9 @@
 # CipherQuest - Hack. Learn. Level Up
 
+[![Build Status](https://github.com/preetraval45/CipherQuest/actions/workflows/ci.yml/badge.svg)](https://github.com/preetraval45/CipherQuest/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Coverage Status](https://img.shields.io/badge/coverage-unknown-lightgrey)](https://github.com/preetraval45/CipherQuest)
+
 A modern, cyberpunk-themed cybersecurity learning platform built with HTML, CSS, and JavaScript.
 
 ## 🎯 Overview
@@ -284,19 +288,11 @@ CipherQuest/
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+We welcome contributions from the community!
 
-### Development Guidelines
-
-- Follow the existing code style
-- Add comments for complex logic
-- Test on multiple browsers
-- Ensure responsive design
-- Update documentation as needed
+- See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/contributing.md](docs/contributing.md) for guidelines.
+- Please follow the code of conduct in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- Open issues and pull requests to help improve CipherQuest.
 
 ## 📄 License
 
