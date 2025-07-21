@@ -90,7 +90,56 @@ docker-compose up --build
 ```
 - This will start the database, backend, and frontend with all secrets loaded from environment variables.
 
----
+## 🧪 Running Tests
+
+### Backend
+```bash
+cd backend
+pytest
+```
+
+### Frontend
+```bash
+cd frontend
+npm test
+# or
+yarn test
+```
+
+## 🐳 Docker Troubleshooting
+
+- **Port Conflicts:**  
+  Ensure ports 3000 (frontend), 5000 (backend), and 3307 (MySQL) are free.
+- **Volume Permissions:**  
+  On Linux/Mac, you may need to adjust permissions for `db_data` volume:
+  ```bash
+  sudo chown -R $USER:$USER ./db_data
+  ```
+- **Database Connection Issues:**  
+  - Check that the `db` service is healthy (`docker ps`).
+  - Ensure environment variables in `docker-compose.yml` and `.env` are correct.
+- **Rebuilding Containers:**  
+  ```bash
+  docker-compose down -v
+  docker-compose up --build
+  ```
+- **Logs:**  
+  ```bash
+  docker-compose logs backend
+  docker-compose logs frontend
+  docker-compose logs db
+  ```
+
+## 📚 Advanced Guides & API Reference
+
+- See the `docs/` folder for:
+  - [API Reference](docs/api-reference.md)
+  - [Architecture](docs/architecture.md)
+  - [Admin Guide](docs/admin-guide.md)
+  - [User Guide](docs/user-guide.md)
+  - [Setup Guide](docs/setup-guide.md)
+  - [Troubleshooting](docs/troubleshooting.md)
+  - [API Spec (OpenAPI)](docs/api_spec.yaml)
 
 ## 🌱 Environment Variables
 
@@ -122,6 +171,11 @@ CORS_ALLOW_HEADERS=Content-Type,Authorization,X-Requested-With
 
 # Docker
 MYSQL_ROOT_PASSWORD=your_secure_mysql_root_password
+```
+
+**Example (`frontend/.env`):**
+```env
+REACT_APP_API_URL=http://localhost:5000/api
 ```
 
 **See [backend/env.example](backend/env.example) for all available variables.**

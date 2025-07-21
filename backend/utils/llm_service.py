@@ -30,7 +30,7 @@ llm_rate_limiter = RateLimiter(max_calls=60, period=60)
 
 def send_prompt_to_llm(prompt, model="gpt-3.5-turbo"):
     if not OPENAI_API_KEY:
-        return {'error': 'OpenAI API key not set in environment.'}
+        return {'error': 'AI service is currently unavailable. Please contact support.'}
     if not llm_rate_limiter.allow():
         return {'error': 'Rate limit exceeded. Please try again later.'}
     try:

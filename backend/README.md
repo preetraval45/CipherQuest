@@ -66,6 +66,9 @@ A comprehensive Flask-based backend for the CipherQuest CTF learning platform, f
    ```bash
    cp env.example .env
    # Edit .env with your configuration
+   # For demo/testing, you can use the following OpenAI API key:
+   # OPENAI_API_KEY=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
+   # (Do NOT use this key in production. Obtain your own from https://platform.openai.com/account/api-keys)
    ```
 
 5. **Create MySQL database**
@@ -121,6 +124,10 @@ GITHUB_CLIENT_SECRET=your-github-client-secret
 # Security Configuration
 BCRYPT_LOG_ROUNDS=12
 RATE_LIMIT_PER_MINUTE=60
+
+# OpenAI API Key (for demo/testing only)
+OPENAI_API_KEY=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
+# (Do NOT use this key in production. Obtain your own from https://platform.openai.com/account/api-keys)
 ```
 
 ## 📚 API Documentation

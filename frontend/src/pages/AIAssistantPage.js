@@ -70,11 +70,15 @@ const AIAssistantPage = () => {
         })
       });
       const data = await response.json();
+      let displayError = data.error;
+      if (displayError && displayError.includes('AI service is currently unavailable')) {
+        displayError = 'AI service is currently unavailable. Please contact support.';
+      }
       if (!response.ok || data.error) {
-        setError(data.error || 'An error occurred.');
+        setError(displayError || 'An error occurred.');
         setMessages(prev => [...prev, {
           id: Date.now() + 1,
-          content: `❌ ${data.error || 'An error occurred.'}`,
+          content: `❌ ${displayError || 'An error occurred.'}`,
           timestamp: new Date(),
           type: 'ai'
         }]);
